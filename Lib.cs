@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -179,7 +179,36 @@ namespace MatrixLibDLL
             }
         }
 
-  
+        public static void division(ref double[,] matrix_A, ref double[,] matrix_B, ref double[,] matrix_C, int row1, int row2, int col1, int col2)
+        {
+          
+            // поиск определителя
+            double d = Reverse.FindDeterminant(matrix_B, row2);
+
+            // поиск алг. дополнений
+            double[,] matrixDop = new double[row2, col2];
+            double[,] matrixPtr = new double[col2, row2];
+            matrixDop = Reverse.FindDop(matrix_B, row2);
+
+            // транспортируемая матрица алг.дополнений
+            transpose(ref matrixDop, row2, col2, ref matrixPtr);
+
+            // расчет обратной
+            for (int i = 0; i < row2; i++)
+            {
+                for (int j = 0; j < col2; j++)
+                {
+                    double ptr = matrixPtr[i, j] * (1 / d);
+                    //ptr = Math.Round(ptr, 3);
+                    matrix_B[i, j] = ptr;
+                }
+            }
+
+            multiplication(ref matrix_A, ref matrix_B, ref matrix_C, row1, row2, col1, col2);
+
+        }
+
+
         public static void transpose(ref double[,] matrix_A, int row, int col, ref double[,] matrixDop)
         {
 
