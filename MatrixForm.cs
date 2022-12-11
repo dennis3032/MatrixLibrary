@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -129,14 +129,14 @@ namespace matrixForm
             dataGridView3.RowCount = row;
             dataGridView3.ColumnCount = col;
 
-            DataGridViewRow normalRowSize;
+          // DataGridViewRow normalRowSize;
             for (int i = 0; i < dataGridView3.RowCount; i++)
             {
                 // меняем название главных строк
                 dataGridView3.Rows[i].HeaderCell.Value = i.ToString();
                 //размер ячеек
-                normalRowSize = dataGridView3.Rows[i];
-                normalRowSize.Height = (dataGridView3.Height / row) - 5;
+               // normalRowSize = dataGridView3.Rows[i];
+               // normalRowSize.Height = (dataGridView3.Height / row) - 5;
             }
 
 
@@ -164,13 +164,13 @@ namespace matrixForm
             dataGridView1.RowCount = row;
             dataGridView1.ColumnCount = col;
 
-            DataGridViewRow normalRowSize;
+            //DataGridViewRow normalRowSize;
             for (int i = 0; i < dataGridView1.RowCount; i++)
             {
                 // меняем название главных строк
                 dataGridView1.Rows[i].HeaderCell.Value = i.ToString();
-                normalRowSize = dataGridView1.Rows[i];
-                normalRowSize.Height = (dataGridView1.Height / row) - 5;
+                //normalRowSize = dataGridView1.Rows[i];
+                //normalRowSize.Height = (dataGridView1.Height / row) - 5;
             }
 
 
@@ -197,14 +197,14 @@ namespace matrixForm
             dataGridView1.RowCount = row;
             dataGridView1.ColumnCount = col;
 
-            DataGridViewRow normalRowSize;
+           // DataGridViewRow normalRowSize;
             for (int i = 0; i < dataGridView1.RowCount; i++)
             {
                 // меняем название главных строк
                 dataGridView1.Rows[i].HeaderCell.Value = i.ToString();
 
-                normalRowSize = dataGridView1.Rows[i];
-                normalRowSize.Height = (dataGridView1.Height / row) - 5;
+               // normalRowSize = dataGridView1.Rows[i];
+               // normalRowSize.Height = (dataGridView1.Height / row) - 5;
             }
 
 
@@ -231,14 +231,14 @@ namespace matrixForm
             dataGridView2.RowCount = row;
             dataGridView2.ColumnCount = col;
 
-            DataGridViewRow normalRowSize;
+           // DataGridViewRow normalRowSize;
             for (int i = 0; i < dataGridView2.RowCount; i++)
             {
                 // меняем название главных строк
                 dataGridView2.Rows[i].HeaderCell.Value = i.ToString();
 
-                normalRowSize = dataGridView2.Rows[i];
-                normalRowSize.Height = (dataGridView2.Height / row) - 5;
+                //normalRowSize = dataGridView2.Rows[i];
+                //normalRowSize.Height = (dataGridView2.Height / row) - 5;
             }
 
 
@@ -265,14 +265,14 @@ namespace matrixForm
             dataGridView2.RowCount = row;
             dataGridView2.ColumnCount = col;
 
-            DataGridViewRow normalRowSize;
+           // DataGridViewRow normalRowSize;
             for (int i = 0; i < dataGridView2.RowCount; i++)
             {
                 // меняем название главных строк
                 dataGridView2.Rows[i].HeaderCell.Value = i.ToString();
 
-                normalRowSize = dataGridView2.Rows[i];
-                normalRowSize.Height = (dataGridView2.Height / row) - 5;
+               // normalRowSize = dataGridView2.Rows[i];
+               // normalRowSize.Height = (dataGridView2.Height / row) - 5;
             }
 
 
@@ -309,7 +309,7 @@ namespace matrixForm
             dataGridView3.RowCount = row;
             dataGridView3.ColumnCount = col;
 
-            DataGridViewRow normalRowSize;
+          //  DataGridViewRow normalRowSize;
             for (int i = 0; i < row; i++)  // название главных столбцов (индексы)
             {
                 dataGridView1.Columns[i].HeaderText = i.ToString();
@@ -321,14 +321,14 @@ namespace matrixForm
                 dataGridView3.Columns[i].HeaderText = i.ToString();
                 dataGridView3.Rows[i].HeaderCell.Value = i.ToString();
 
-                normalRowSize = dataGridView1.Rows[i];
-                normalRowSize.Height = (dataGridView1.Height / row) - 5;
+               // normalRowSize = dataGridView1.Rows[i];
+                //normalRowSize.Height = (dataGridView1.Height / row) - 5;
 
-                normalRowSize = dataGridView2.Rows[i];
-                normalRowSize.Height = (dataGridView2.Height / row) - 5;
+               // normalRowSize = dataGridView2.Rows[i];
+               // normalRowSize.Height = (dataGridView2.Height / row) - 5;
 
-                normalRowSize = dataGridView3.Rows[i];
-                normalRowSize.Height = (dataGridView3.Height / row) - 5;
+               // normalRowSize = dataGridView3.Rows[i];
+               // normalRowSize.Height = (dataGridView3.Height / row) - 5;
             }
 
             for (int i = 0; i < row; i++)
@@ -452,11 +452,11 @@ namespace matrixForm
             // в случае изменения размера массива - перерисовка 
             dataGridView1.RowCount = Convert.ToInt32(numericUpDown1.Value);
 
-            DataGridViewRow normalRowSize;
+           // DataGridViewRow normalRowSize;
             for (int j = 0; j < dataGridView1.RowCount; j++)
             {
-                normalRowSize = dataGridView1.Rows[j];
-                normalRowSize.Height = (dataGridView1.Height / dataGridView1.RowCount) - 5;
+              //  normalRowSize = dataGridView1.Rows[j];
+                //normalRowSize.Height = (dataGridView1.Height / dataGridView1.RowCount) - 5;
             }
 
             int i = dataGridView1.RowCount - 1;
@@ -497,12 +497,12 @@ namespace matrixForm
             // в случае изменения размера массива - перерисовка 
             dataGridView2.RowCount = Convert.ToInt32(numericUpDown3.Value);
 
-            DataGridViewRow normalRowSize;
-            for (int j = 0; j < dataGridView2.RowCount; j++)
+            //DataGridViewRow normalRowSize;
+           /* for (int j = 0; j < dataGridView2.RowCount; j++)
             {
                 normalRowSize = dataGridView2.Rows[j];
                 normalRowSize.Height = (dataGridView2.Height / dataGridView2.RowCount) - 5;
-            }
+            }*/
 
             int i = dataGridView2.RowCount - 1;
 
@@ -941,6 +941,160 @@ namespace matrixForm
             // печать строки str
             e.Graphics.DrawString(str, new Font("Arial", 14), Brushes.Black, 0, 0);
         }
+
+        private void консольToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("hello");
+        }
+
+        // ввод матрицы А из файла
+       
+        private void матрицуАToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            string filename = openFileDialog1.FileName;
+            string[] filetext = System.IO.File.ReadAllLines(filename);
+
+            string[] strPtr = filetext[0].Split(' ');
+            int column = strPtr.Length;
+
+            matrixPtr = new double[filetext.Length, column];
+            for (int i = 0; i < filetext.Length; i++) // идем построчно
+            {
+                string[] str = filetext[i].Split(' ');
+                for (int j = 0; j < column; j++)
+                {
+                    matrixPtr[i, j] = Convert.ToDouble(str[j]);
+                }
+            }
+            fillingMatrix1(filetext.Length, column, matrixPtr);
+
+
+            MessageBox.Show("Файл открыт!");
+        }
+
+        // ввод матрицы В из файла
+        private void матрицуВToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            string filename = openFileDialog1.FileName;
+            string[] filetext = System.IO.File.ReadAllLines(filename);
+
+            string[] strPtr = filetext[0].Split(' ');
+            int column = strPtr.Length;
+
+            matrixPtr = new double[filetext.Length, column];
+            for (int i = 0; i < filetext.Length; i++) // идем построчно
+            {
+                string[] str = filetext[i].Split(' ');
+                for (int j = 0; j < column; j++)
+                {
+                    matrixPtr[i, j] = Convert.ToDouble(str[j]);
+                }
+            }
+            fillingMatrix2(filetext.Length, column, matrixPtr);
+
+
+            MessageBox.Show("Файл открыт!");
+        }
+
+        // проверка сложения 
+        private void сложенияToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Check check = new Check(this);
+            check.Show();
+
+            double[,] matrix_B = new double[dataGridView2.RowCount, dataGridView2.ColumnCount];
+            double[,] matrix_Res = new double[dataGridView3.RowCount, dataGridView3.ColumnCount];
+
+            for (int i = 0; i < dataGridView2.RowCount; i++) // идем построчно
+            {
+                for (int j = 0; j < dataGridView2.ColumnCount; j++)
+                {
+                    matrix_B[i, j] = Convert.ToDouble(dataGridView2.Rows[i].Cells[j].Value);
+                }
+            }
+
+            for (int i = 0; i < dataGridView3.RowCount; i++) // идем построчно
+            {
+                for (int j = 0; j < dataGridView3.ColumnCount; j++)
+                {
+                    matrix_Res[i, j] = Convert.ToDouble(dataGridView3.Rows[i].Cells[j].Value);
+                }
+            }
+
+            check.sum(matrix_B, matrix_Res, dataGridView2.RowCount, dataGridView2.ColumnCount, dataGridView3.RowCount, dataGridView3.ColumnCount);
+
+        }
+
+        // проверка вычитания 
+        private void вычитанияToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Check check = new Check(this);
+            check.Show();
+
+            double[,] matrix_B = new double[dataGridView2.RowCount, dataGridView2.ColumnCount];
+            double[,] matrix_Res = new double[dataGridView3.RowCount, dataGridView3.ColumnCount];
+
+            for (int i = 0; i < dataGridView2.RowCount; i++) 
+            {
+                for (int j = 0; j < dataGridView2.ColumnCount; j++)
+                {
+                    matrix_B[i, j] = Convert.ToDouble(dataGridView2.Rows[i].Cells[j].Value);
+                }
+            }
+
+            for (int i = 0; i < dataGridView3.RowCount; i++) 
+            {
+                for (int j = 0; j < dataGridView3.ColumnCount; j++)
+                {
+                    matrix_Res[i, j] = Convert.ToDouble(dataGridView3.Rows[i].Cells[j].Value);
+                }
+            }
+
+            check.sub(matrix_B, matrix_Res, dataGridView2.RowCount, dataGridView2.ColumnCount, dataGridView3.RowCount, dataGridView3.ColumnCount);
+
+        }
+        //проверка умножения
+        private void умноженияToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Check check = new Check(this);
+            check.Show();
+
+            double[,] matrix_B = new double[dataGridView2.RowCount, dataGridView2.ColumnCount];
+            double[,] matrix_Res = new double[dataGridView3.RowCount, dataGridView3.ColumnCount];
+
+            for (int i = 0; i < dataGridView2.RowCount; i++)
+            {
+                for (int j = 0; j < dataGridView2.ColumnCount; j++)
+                {
+                    matrix_B[i, j] = Convert.ToDouble(dataGridView2.Rows[i].Cells[j].Value);
+                }
+            }
+
+            for (int i = 0; i < dataGridView3.RowCount; i++)
+            {
+                for (int j = 0; j < dataGridView3.ColumnCount; j++)
+                {
+                    matrix_Res[i, j] = Convert.ToDouble(dataGridView3.Rows[i].Cells[j].Value);
+                }
+            }
+
+
+            check.mult(matrix_B, matrix_Res, dataGridView2.RowCount, dataGridView2.ColumnCount, dataGridView3.RowCount, dataGridView3.ColumnCount);
+
+        }
     }
 }
-
