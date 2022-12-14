@@ -10,288 +10,204 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using MatrixLibDLL;
 using System.Drawing.Printing;
+using System.IO;
+using System.Security.Cryptography;
+using System.Threading;
 
 namespace matrixForm
 {
     public partial class MatrixForm : Form
     {
-        private double[,] matrix1;
-        private double[,] matrix2;
-        private double[,] matrixResult;
-        private double[,] matrixPtr;
+        
+        private int hashCode = 0;
 
-
-        private  int row1 = 0;
-        private  int col1 = 0;
-        private int row2 = 0;
-        private  int col2 = 0;
-        private  int row3 = 0;
-        private int col3 = 0;
+        //  private byte[] buf;
         public MatrixForm()
         {
             InitializeComponent();
         }
 
-        // заполнение матрицы 1 и 2 из datagridview
-        public string filling(int flag)
+        // считывание матриц из data grid view
+        public string readingFromDataGridView(ref double[,] matrix, int flag)
         {
-            if (flag == 1)// заполняем первую матрицу
+            switch (flag)
             {
-                for (int i = 0; i < dataGridView1.RowCount; i++) // заполнение массива
-                {
-                    for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                //считываем первую матрицу
+                case 1:
+                    for (int i = 0; i < dataGridView1.RowCount; i++) // заполнение массива
                     {
-                        string str = Convert.ToString(dataGridView1.Rows[i].Cells[j].Value);
-                        try
+                        for (int j = 0; j < dataGridView1.ColumnCount; j++)
                         {
-                            if (str == "") // проверка на пустоту элемента массива
+                            string str = Convert.ToString(dataGridView1.Rows[i].Cells[j].Value);
+                            try
                             {
-                                throw new Exception("Отсутсвует элемент матрицы 1 !");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                            return ex.Message;
-                        }
-
-                        try
-                        { // проверка элемента массива на число
-                            for (int h = 0; h < str.Length; h++)
-                            {
-                                if (!(str[h] >= '0' && str[h] <= '9' || str[h] == '-' || str[h] == ','))
+                                if (str == "") // проверка на пустоту элемента массива
                                 {
-                                    throw new Exception("Элемент матрицы 1 не является числом!");
+                                    throw new Exception("Отсутсвует элемент матрицы А !");
+                                }
+
+                                // проверка элемента массива на число
+                                for (int h = 0; h < str.Length; h++)
+                                {
+                                    if (!(str[h] >= '0' && str[h] <= '9' || str[h] == '-' || str[h] == ','))
+                                    {
+                                        throw new Exception("Элемент матрицы А не является числом!");
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                            return ex.Message;
-                        }
-
-                        matrix1[i, j] = Convert.ToDouble(dataGridView1.Rows[i].Cells[j].Value);
-                    }
-                }
-                return "ОК";
-            }
-            else   // заполняем вторую матрицу
-            {
-                for (int i = 0; i < dataGridView2.RowCount; i++) // заполнение массива
-                {
-                    for (int j = 0; j < dataGridView2.ColumnCount; j++)
-                    {
-                        string str = Convert.ToString(dataGridView2.Rows[i].Cells[j].Value);
-                        try
-                        {
-                            if (str == "") // проверка на пустоту элемента массива
+                            catch (Exception ex)
                             {
-                                throw new Exception("Отсутсвует элемент матрицы 2 !");
+                                MessageBox.Show(ex.Message);
+                                return ex.Message;
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                            return ex.Message;
-                        }
 
-                        try
-                        { // проверка элемента массива на число
-                            for (int h = 0; h < str.Length; h++)
+                            matrix[i, j] = Convert.ToDouble(dataGridView1.Rows[i].Cells[j].Value);
+                        }
+                    }
+                    return "ok";
+
+                //считываем вторую матрицу 
+                case 2:
+                    for (int i = 0; i < dataGridView2.RowCount; i++) // заполнение массива
+                    {
+                        for (int j = 0; j < dataGridView2.ColumnCount; j++)
+                        {
+                            string str = Convert.ToString(dataGridView2.Rows[i].Cells[j].Value);
+                            try
                             {
-                                if (!(str[h] >= '0' && str[h] <= '9' || str[h] == '-' || str[h] == ',' || str[h] == '.'))
+                                if (str == "") // проверка на пустоту элемента массива
                                 {
-                                    throw new Exception("Элемент матрицы 2 не является числом!");
+                                    throw new Exception("Отсутсвует элемент матрицы B !");
+                                }
+
+                                // проверка элемента массива на число
+                                for (int h = 0; h < str.Length; h++)
+                                {
+                                    if (!(str[h] >= '0' && str[h] <= '9' || str[h] == '-' || str[h] == ','))
+                                    {
+                                        throw new Exception("Элемент матрицы B не является числом!");
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                            return ex.Message;
-                        }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message);
+                                return ex.Message;
+                            }
 
-                        matrix2[i, j] = Convert.ToDouble(dataGridView2.Rows[i].Cells[j].Value);
+                            matrix[i, j] = Convert.ToDouble(dataGridView2.Rows[i].Cells[j].Value);
+                        }
                     }
-                }
-                return "ОК";
-            }
+                    return "ok";
 
+                //считываем результирующую матрицу 
+                default:
+                    for (int i = 0; i < dataGridView3.RowCount; i++) // заполнение массива
+                    {
+                        for (int j = 0; j < dataGridView3.ColumnCount; j++)
+                        {
+                            string str = Convert.ToString(dataGridView3.Rows[i].Cells[j].Value);
+                            try
+                            {
+                                if (str == "") // проверка на пустоту элемента массива
+                                {
+                                    throw new Exception("Отсутсвует элемент результирующей матрицы!");
+                                }
+
+                                // проверка элемента массива на число
+                                for (int h = 0; h < str.Length; h++)
+                                {
+                                    if (!(str[h] >= '0' && str[h] <= '9' || str[h] == '-' || str[h] == ','))
+                                    {
+                                        throw new Exception("Элемент результирующей матрицы не является числом!");
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message);
+                                return ex.Message;
+                            }
+
+                            matrix[i, j] = Convert.ToDouble(dataGridView3.Rows[i].Cells[j].Value);
+                        }
+                    }
+                    return "ok";
+            }
         }
 
 
-        //вывод результата
-        public void fillingResult(int row, int col)
+        // запись матриц в data grid view (ИЗМЕНЕНИЕ КЛЕТОК)
+        public void fillingInDataGridView(int row, int col, ref double[,] matrix, int flag)
         {
-
-            // в случае изменения размера массива - перерисовка 
-            dataGridView3.RowCount = row;
-            dataGridView3.ColumnCount = col;
-
-          // DataGridViewRow normalRowSize;
-            for (int i = 0; i < dataGridView3.RowCount; i++)
+            switch (flag)
             {
-                // меняем название главных строк
-                dataGridView3.Rows[i].HeaderCell.Value = i.ToString();
-                //размер ячеек
-               // normalRowSize = dataGridView3.Rows[i];
-               // normalRowSize.Height = (dataGridView3.Height / row) - 5;
-            }
+                //запись первой матрицы
+                case 1:
+                    dataGridView1.RowCount = row;
+                    dataGridView1.ColumnCount = col;
 
+                    DataGridViewRow normalRowSize;
+                    for (int i = 0; i < row; i++)
+                    {
+                        dataGridView1.Rows[i].HeaderCell.Value = i.ToString();
+                        normalRowSize = dataGridView1.Rows[i];
+                        normalRowSize.Height = (dataGridView1.Height / row) - 5;
 
-            for (int i = 0; i < dataGridView3.ColumnCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView3.Columns[i].HeaderText = i.ToString();
-            }
+                        for (int j = 0; j < col; j++)
+                        {
+                            dataGridView1.Columns[j].HeaderText = j.ToString();
+                            dataGridView1.Rows[i].Cells[j].Value = matrix[i, j];
+                        }
+                    }
 
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    dataGridView3.Rows[i].Cells[j].Value = matrixResult[i, j];
-                }
-            }
-        }
+                    break;
 
+                //запись второй матрицы
+                case 2:
 
-        //вывод матрицы 1
-        public void fillingMatrix1(int row, int col)
-        {
+                    dataGridView2.RowCount = row;
+                    dataGridView2.ColumnCount = col;
 
-            // в случае изменения размера массива - перерисовка 
-            dataGridView1.RowCount = row;
-            dataGridView1.ColumnCount = col;
+                    DataGridViewRow normalRowSize2;
+                    for (int i = 0; i < row; i++)
+                    {
+                        dataGridView2.Rows[i].HeaderCell.Value = i.ToString();
+                        normalRowSize2 = dataGridView2.Rows[i];
+                        normalRowSize2.Height = (dataGridView2.Height / row) - 5;
 
-            //DataGridViewRow normalRowSize;
-            for (int i = 0; i < dataGridView1.RowCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView1.Rows[i].HeaderCell.Value = i.ToString();
-                //normalRowSize = dataGridView1.Rows[i];
-                //normalRowSize.Height = (dataGridView1.Height / row) - 5;
-            }
+                        for (int j = 0; j < col; j++)
+                        {
+                            dataGridView2.Columns[j].HeaderText = j.ToString();
+                            dataGridView2.Rows[i].Cells[j].Value = matrix[i, j];
+                        }
+                    }
+                    break;
 
+                //запись результирующей матрицы
+                default:
 
-            for (int i = 0; i < dataGridView1.ColumnCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView1.Columns[i].HeaderText = i.ToString();
-            }
+                    dataGridView3.RowCount = row;
+                    dataGridView3.ColumnCount = col;
 
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    dataGridView1.Rows[i].Cells[j].Value = matrix1[i, j];
-                }
-            }
-        }
-
-
-        public void fillingMatrix1(int row, int col, double[,] matrix)
-        {
-
-            // в случае изменения размера массива - перерисовка 
-            dataGridView1.RowCount = row;
-            dataGridView1.ColumnCount = col;
-
-           // DataGridViewRow normalRowSize;
-            for (int i = 0; i < dataGridView1.RowCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView1.Rows[i].HeaderCell.Value = i.ToString();
-
-               // normalRowSize = dataGridView1.Rows[i];
-               // normalRowSize.Height = (dataGridView1.Height / row) - 5;
-            }
-
-
-            for (int i = 0; i < dataGridView1.ColumnCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView1.Columns[i].HeaderText = i.ToString();
-            }
-
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    dataGridView1.Rows[i].Cells[j].Value = matrix[i, j];
-                }
+                    DataGridViewRow normalRowSize3;
+                    for (int i = 0; i < row; i++)
+                    {
+                        dataGridView3.Rows[i].HeaderCell.Value = i.ToString();
+                        normalRowSize3 = dataGridView3.Rows[i];
+                        normalRowSize3.Height = (dataGridView3.Height / row) - 5;
+                        for (int j = 0; j < col; j++)
+                        {
+                            dataGridView3.Columns[j].HeaderText = j.ToString();
+                            dataGridView3.Rows[i].Cells[j].Value = matrix[i, j];
+                        }
+                    }
+                    break;
             }
         }
 
 
-        //вывод матрицы 2
-        public void fillingMatrix2(int row, int col)
-        {
-            // в случае изменения размера массива - перерисовка 
-            dataGridView2.RowCount = row;
-            dataGridView2.ColumnCount = col;
-
-           // DataGridViewRow normalRowSize;
-            for (int i = 0; i < dataGridView2.RowCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView2.Rows[i].HeaderCell.Value = i.ToString();
-
-                //normalRowSize = dataGridView2.Rows[i];
-                //normalRowSize.Height = (dataGridView2.Height / row) - 5;
-            }
-
-
-            for (int i = 0; i < dataGridView2.ColumnCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView2.Columns[i].HeaderText = i.ToString();
-            }
-
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    dataGridView2.Rows[i].Cells[j].Value = matrix2[i, j];
-                }
-            }
-        }
-
-
-        public void fillingMatrix2(int row, int col, double[,] matrix)
-        {
-
-            // в случае изменения размера массива - перерисовка 
-            dataGridView2.RowCount = row;
-            dataGridView2.ColumnCount = col;
-
-           // DataGridViewRow normalRowSize;
-            for (int i = 0; i < dataGridView2.RowCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView2.Rows[i].HeaderCell.Value = i.ToString();
-
-               // normalRowSize = dataGridView2.Rows[i];
-               // normalRowSize.Height = (dataGridView2.Height / row) - 5;
-            }
-
-
-            for (int i = 0; i < dataGridView2.ColumnCount; i++)
-            {
-                // меняем название главных строк
-                dataGridView2.Columns[i].HeaderText = i.ToString();
-            }
-
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    dataGridView2.Rows[i].Cells[j].Value = matrix[i, j];
-                }
-            }
-        }
-
-
+        //(ИЗМЕНЕНИЕ КЛЕТОК)
         private void MatrixForm_Load(object sender, EventArgs e)
         {
             int row = 5;
@@ -309,7 +225,7 @@ namespace matrixForm
             dataGridView3.RowCount = row;
             dataGridView3.ColumnCount = col;
 
-          //  DataGridViewRow normalRowSize;
+             DataGridViewRow normalRowSize;
             for (int i = 0; i < row; i++)  // название главных столбцов (индексы)
             {
                 dataGridView1.Columns[i].HeaderText = i.ToString();
@@ -321,14 +237,14 @@ namespace matrixForm
                 dataGridView3.Columns[i].HeaderText = i.ToString();
                 dataGridView3.Rows[i].HeaderCell.Value = i.ToString();
 
-               // normalRowSize = dataGridView1.Rows[i];
-                //normalRowSize.Height = (dataGridView1.Height / row) - 5;
+                normalRowSize = dataGridView1.Rows[i];
+                normalRowSize.Height = (dataGridView1.Height / row) - 5;
 
-               // normalRowSize = dataGridView2.Rows[i];
-               // normalRowSize.Height = (dataGridView2.Height / row) - 5;
+                normalRowSize = dataGridView2.Rows[i];
+                normalRowSize.Height = (dataGridView2.Height / row) - 5;
 
-               // normalRowSize = dataGridView3.Rows[i];
-               // normalRowSize.Height = (dataGridView3.Height / row) - 5;
+                normalRowSize = dataGridView3.Rows[i];
+                normalRowSize.Height = (dataGridView3.Height / row) - 5;
             }
 
             for (int i = 0; i < row; i++)
@@ -342,62 +258,96 @@ namespace matrixForm
             }
         }
 
-        // фомирование str, включающей матрицы
-        private string createTextMatrix()
+        // формирование строки из матриц
+        private string createStringMatrix(int flag)
         {
             StringBuilder str = new StringBuilder();
-
-            row1 = dataGridView1.RowCount;
-            col1 = dataGridView1.ColumnCount;
-
-            row2 = dataGridView2.RowCount;
-            col2 = dataGridView2.ColumnCount;
-
-            row3 = dataGridView3.RowCount;
-            col3 = dataGridView3.ColumnCount;
-
-            str.Append("Matrix A: \r\n");
-            for (int i = 0; i < row1; i++)
+            switch (flag)
             {
-                for (int j = 0; j < col1; j++)
-                {
-                    str.Append(String.Format("{0,5}", dataGridView1.Rows[i].Cells[j].Value)).Append("  ");
+                // первая матрица
+                case 1:
+                    for (int i = 0; i < dataGridView1.RowCount; i++)
+                    {
+                        for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                        {
+                            str.Append(dataGridView1.Rows[i].Cells[j].Value).Append(" ");
 
-                }
-                str.Append("\r\n");
+                        }
+                        str.Append("\r\n");
+                    }
+                    str.Append(" ");//!!
+                    return str.ToString();
+                // вторая матрица
+                case 2:
+                    for (int i = 0; i < dataGridView2.RowCount; i++)
+                    {
+                        for (int j = 0; j < dataGridView2.ColumnCount; j++)
+                        {
+                            str.Append(dataGridView2.Rows[i].Cells[j].Value).Append(" ");
+                        }
+                        str.Append("\r\n");
+                    }
+                    str.Append(" ");//!!!
+                    return str.ToString();
+                //результирующая матрица
+                case 3:
+                    for (int i = 0; i < dataGridView3.RowCount; i++)
+                    {
+                        for (int j = 0; j < dataGridView3.ColumnCount; j++)
+                        {
+                            str.Append(dataGridView3.Rows[i].Cells[j].Value).Append(" ");
+                        }
+                        str.Append("\r\n");
+                    }
+                    str.Append(" ");//!!!
+                    return str.ToString();
+                //иначе все вместе
+                default:
+                    //str.Append("Matrix A: \r\n");
+                    for (int i = 0; i < dataGridView1.RowCount; i++)
+                    {
+                        for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                        {
+                            str.Append(dataGridView1.Rows[i].Cells[j].Value).Append(" ");
+                        }
+                        str.Append("\r\n");
+                    }
+
+                    // str.Append("\r\nMatrix B: \r\n");
+                    for (int i = 0; i < dataGridView2.RowCount; i++)
+                    {
+                        for (int j = 0; j < dataGridView2.ColumnCount; j++)
+                        {
+                            str.Append(dataGridView2.Rows[i].Cells[j].Value).Append(" ");
+                        }
+                        str.Append("\r\n");
+                    }
+
+                    //  str.Append("\r\nMatrix Result: \r\n");
+                    for (int i = 0; i < dataGridView3.RowCount; i++)
+                    {
+                        for (int j = 0; j < dataGridView3.ColumnCount; j++)
+                        {
+                            str.Append(dataGridView3.Rows[i].Cells[j].Value).Append(" ");
+                        }
+                        str.Append("\r\n");
+                    }
+                    str.Append(" "); //!!!
+                    return str.ToString();
+
+
             }
 
-            str.Append("\r\nMatrix B: \r\n");
-            for (int i = 0; i < row2; i++)
-            {
-                for (int j = 0; j < col2; j++)
-                {
-                    str.Append(String.Format("{0,5}", dataGridView2.Rows[i].Cells[j].Value)).Append("  ");
 
-                }
-                str.Append("\r\n");
-            }
-
-            str.Append("\r\nMatrix Result: \r\n");
-            for (int i = 0; i < row3; i++)
-            {
-                for (int j = 0; j < col3; j++)
-                {
-                    str.Append(String.Format("{0,5}", dataGridView3.Rows[i].Cells[j].Value)).Append("  ");
-
-                }
-                str.Append("\r\n");
-            }
-
-            return str.ToString();
         }
+
 
         // кнопка отчистить для первой матрицы
         private void button4_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < numericUpDown1.Value; i++)
+            for (int i = 0; i < dataGridView1.RowCount; i++)
             {
-                for (int j = 0; j < numericUpDown2.Value; j++)
+                for (int j = 0; j < dataGridView1.ColumnCount; j++)
                 {
                     dataGridView1.Rows[i].Cells[j].Value = 0;
                 }
@@ -408,9 +358,9 @@ namespace matrixForm
         // кнопка отчистить для второй матрицы
         private void button9_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < numericUpDown3.Value; i++)
+            for (int i = 0; i < dataGridView2.RowCount; i++)
             {
-                for (int j = 0; j < numericUpDown4.Value; j++)
+                for (int j = 0; j < dataGridView2.ColumnCount; j++)
                 {
                     dataGridView2.Rows[i].Cells[j].Value = 0;
                 }
@@ -420,56 +370,55 @@ namespace matrixForm
 
         //изменение размера столбцов для первой матрицы 
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
-        {
+        {  // прошлое число столбцов
             int tmp = dataGridView1.ColumnCount;
 
-            // в случае изменения размера массива - перерисовка 
+            // новое число столбцов
             dataGridView1.ColumnCount = Convert.ToInt32(numericUpDown2.Value);
-
-
-            int i = dataGridView1.ColumnCount - 1;
-
-            // меняем название главных столбцов
-            dataGridView1.Columns[i].HeaderText = i.ToString();
 
             if (tmp < dataGridView1.ColumnCount)
             {
-                // дополоняем нулями
-                for (int j = 0; j < Convert.ToInt32(numericUpDown1.Value); j++)
+
+                for (int i = 0; i < dataGridView1.RowCount; i++)
                 {
-                    dataGridView1.Rows[j].Cells[i].Value = 0;
+                    for (int j = tmp; j < dataGridView1.ColumnCount; j++)
+                    {
+                        dataGridView1.Rows[i].Cells[j].Value = 0;
+                        dataGridView1.Columns[j].HeaderText = j.ToString();
+                    }
                 }
             }
 
         }
 
 
-        //изменение размера строк для первой матрицы
+        //изменение размера строк для первой матрицы(ИЗМЕНЕНИЕ КЛЕТОК)
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
+            // прошлое число строк
             int tmp = dataGridView1.RowCount;
 
-            // в случае изменения размера массива - перерисовка 
+            // новое число строк
             dataGridView1.RowCount = Convert.ToInt32(numericUpDown1.Value);
 
-           // DataGridViewRow normalRowSize;
-            for (int j = 0; j < dataGridView1.RowCount; j++)
-            {
-              //  normalRowSize = dataGridView1.Rows[j];
-                //normalRowSize.Height = (dataGridView1.Height / dataGridView1.RowCount) - 5;
-            }
-
-            int i = dataGridView1.RowCount - 1;
-
-            // меняем название главных строк
-            dataGridView1.Rows[i].HeaderCell.Value = i.ToString();
-
+            DataGridViewRow normalRowSize;
             if (tmp < dataGridView1.RowCount)
             {
-                // дополоняем нулями
-                for (int j = 0; j < Convert.ToInt32(numericUpDown2.Value); j++)
+                for (int i = 0; i < dataGridView1.RowCount; i++)//!!!
                 {
-                    dataGridView1.Rows[i].Cells[j].Value = 0;
+                    normalRowSize = dataGridView1.Rows[i];
+                    normalRowSize.Height = (dataGridView1.Height / tmp) - 5;
+                }
+
+                for (int i = tmp; i < dataGridView1.RowCount; i++)
+                {
+                    dataGridView1.Rows[i].HeaderCell.Value = i.ToString();
+
+                    for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                    {
+                        dataGridView1.Rows[i].Cells[j].Value = 0;
+                    }
+
                 }
             }
         }
@@ -491,30 +440,30 @@ namespace matrixForm
         //изменение размера строк для второй матрицы 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-
+            //прошлое число строк
             int tmp = dataGridView2.RowCount;
 
-            // в случае изменения размера массива - перерисовка 
+            // новое число строк
             dataGridView2.RowCount = Convert.ToInt32(numericUpDown3.Value);
 
-            //DataGridViewRow normalRowSize;
-           /* for (int j = 0; j < dataGridView2.RowCount; j++)
-            {
-                normalRowSize = dataGridView2.Rows[j];
-                normalRowSize.Height = (dataGridView2.Height / dataGridView2.RowCount) - 5;
-            }*/
-
-            int i = dataGridView2.RowCount - 1;
-
-            // меняем название главных строк
-            dataGridView2.Rows[i].HeaderCell.Value = i.ToString();
-
+            DataGridViewRow normalRowSize;
             if (tmp < dataGridView2.RowCount)
             {
-                // дополоняем нулями
-                for (int j = 0; j < Convert.ToInt32(numericUpDown4.Value); j++)
+                for (int i = 0; i < dataGridView2.RowCount; i++)//!!!
                 {
-                    dataGridView2.Rows[i].Cells[j].Value = 0;
+                    normalRowSize = dataGridView2.Rows[i];
+                    normalRowSize.Height = (dataGridView2.Height / tmp) - 5;
+                }
+
+                for (int i = tmp; i < dataGridView2.RowCount; i++)
+                {
+                    dataGridView2.Rows[i].HeaderCell.Value = i.ToString();
+
+                    for (int j = 0; j < dataGridView2.ColumnCount; j++)
+                    {
+                        dataGridView2.Rows[i].Cells[j].Value = 0;
+                    }
+
                 }
             }
         }
@@ -523,23 +472,22 @@ namespace matrixForm
         //изменение размера столбцов для второй матрицы 
         private void numericUpDown4_ValueChanged(object sender, EventArgs e)
         {
-
+            // прошлое число столбцов
             int tmp = dataGridView2.ColumnCount;
 
-            // в случае изменения размера массива - перерисовка 
+            //новое число столбцов
             dataGridView2.ColumnCount = Convert.ToInt32(numericUpDown4.Value);
-
-            int i = dataGridView2.ColumnCount - 1;
-
-            // меняем название главных столбцов
-            dataGridView2.Columns[i].HeaderText = i.ToString();
 
             if (tmp < dataGridView2.ColumnCount)
             {
-                // дополоняем нулями
-                for (int j = 0; j < Convert.ToInt32(numericUpDown3.Value); j++)
+
+                for (int i = 0; i < dataGridView2.RowCount; i++)
                 {
-                    dataGridView2.Rows[j].Cells[i].Value = 0;
+                    for (int j = tmp; j < dataGridView2.ColumnCount; j++)
+                    {
+                        dataGridView2.Rows[i].Cells[j].Value = 0;
+                        dataGridView2.Columns[j].HeaderText = j.ToString();
+                    }
                 }
             }
         }
@@ -549,66 +497,74 @@ namespace matrixForm
         private void button2_Click(object sender, EventArgs e)
         {
 
-            row1 = dataGridView1.RowCount;
-            col1 = dataGridView1.ColumnCount;
+            int row1 = dataGridView1.RowCount;
+            int col1 = dataGridView1.ColumnCount;
 
-            matrix1 = new double[row1, col1];
-            matrixPtr = new double[col1, row1];
+            double[,] matrix1 = new double[row1, col1];
+            double[,] matrixPtr = new double[col1, row1];
 
-            string str1 = filling(1); //заполняем первую матрицу
+            //считываем значения из data grid в первую матрицу
+            string str1 = readingFromDataGridView(ref matrix1, 1);
 
-            if (str1 == "ОК")
+            if (str1 == "ok")
             {
                 MatrixLibDLL.Lib.transpose(ref matrix1, row1, col1, ref matrixPtr);
                 numericUpDown1.Value = col1;
                 numericUpDown2.Value = row1;
-                fillingMatrix1(col1, row1, matrixPtr);
-
+                fillingInDataGridView(col1, row1, ref matrixPtr, 1);
             }
         }
 
 
-        //обратная для первой матрицы
+        //обратная для первой матрицы(ПОТОКИ)
         private void button3_Click(object sender, EventArgs e)
         {
-
-            try
+            Thread t1 = new Thread((o) =>
             {
-                row1 = dataGridView1.RowCount;
-                col1 = dataGridView1.ColumnCount;
-
-                if (row1 != col1)
+                try
                 {
-                    throw new Exception("Невозможно найти обратную матрицу для неквадртной исходной матрицы! ");
-                }
-                else
-                {
-                    matrix1 = new double[row1, col1];
-                    string str1 = filling(1); //заполняем первую матрицу
+                    int row1 = dataGridView1.RowCount;
+                    int col1 = dataGridView1.ColumnCount;
 
-                    if (str1 == "ОК")
+                    if (row1 != col1)
                     {
-                        double det = MatrixLibDLL.Lib.Reverse.FindDeterminant(matrix1, row1);
+                        throw new Exception("Невозможно найти обратную матрицу для неквадртной исходной матрицы! ");
+                    }
+                    else
+                    {
+                        double[,] matrix1 = new double[row1, col1];
 
-                        if (det == 0)
+                        //считываем значения из data grid в первую матрицу
+                        string str1 = readingFromDataGridView(ref matrix1, 1);
+
+                        if (str1 == "ok")
                         {
-                            throw new Exception("Определитель равен нулю, невозможно найти обратную матрицу! ");
+                            double det = MatrixLibDLL.Lib.Reverse.FindDeterminant(matrix1, row1);
+
+                            if (det == 0)
+                            {
+                                throw new Exception("Определитель равен нулю, невозможно найти обратную матрицу! ");
+                            }
+                            else
+                            {
+                                MatrixLibDLL.Lib.reverse(ref matrix1, row1, col1);
+                                fillingInDataGridView(row1, col1, ref matrix1, 1);
+
+                            }
                         }
-                        else
-                        {
-                            MatrixLibDLL.Lib.reverse(ref matrix1, row1, col1);
-                            fillingMatrix1(row1, col1);
-                        }
+
                     }
 
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return;
+                }
+            });
+            t1.Start(); // ???
+            //t1.Join(); //
 
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                return;
-            }
         }
 
         // сложение матриц
@@ -616,11 +572,11 @@ namespace matrixForm
         {
             try
             {
-                row1 = dataGridView1.RowCount;
-                col1 = dataGridView1.ColumnCount;
+                int row1 = dataGridView1.RowCount;
+                int col1 = dataGridView1.ColumnCount;
 
-                row2 = dataGridView2.RowCount;
-                col2 = dataGridView2.ColumnCount;
+                int row2 = dataGridView2.RowCount;
+                int col2 = dataGridView2.ColumnCount;
 
                 if (row1 != row2 || col1 != col2)
                 {
@@ -628,16 +584,20 @@ namespace matrixForm
                 }
                 else
                 {
-                    matrix1 = new double[row1, col1];
-                    matrix2 = new double[row2, col2];
-                    matrixResult = new double[row2, col2];
+                    double[,] matrix1 = new double[row1, col1];
+                    double[,] matrix2 = new double[row2, col2];
+                    double[,] matrixResult = new double[row2, col2];
 
-                    string str1 = filling(1); //заполняем первую матрицу
-                    string str2 = filling(2);//заполняем вторую матрицу
-                    if (str1 == "ОК" && str2 == "ОК")
+                    //считываем значения из data grid в первую матрицу
+                    string str1 = readingFromDataGridView(ref matrix1, 1);
+
+                    //считываем значения из data grid во вторую матрицу
+                    string str2 = readingFromDataGridView(ref matrix2, 2);
+
+                    if (str1 == "ok" && str2 == "ok")
                     {
                         MatrixLibDLL.Lib.addition(ref matrix1, ref matrix2, ref matrixResult, row1, col1);
-                        fillingResult(row1, col1);
+                        fillingInDataGridView(row1, col1, ref matrixResult, 3);
                     }
 
                 }
@@ -657,11 +617,11 @@ namespace matrixForm
         {
             try
             {
-                row1 = dataGridView1.RowCount;
-                col1 = dataGridView1.ColumnCount;
+                int row1 = dataGridView1.RowCount;
+                int col1 = dataGridView1.ColumnCount;
 
-                row2 = dataGridView2.RowCount;
-                col2 = dataGridView2.ColumnCount;
+                int row2 = dataGridView2.RowCount;
+                int col2 = dataGridView2.ColumnCount;
 
                 if (row1 != row2 || col1 != col2)
                 {
@@ -669,16 +629,21 @@ namespace matrixForm
                 }
                 else
                 {
-                    matrix1 = new double[row1, col1];
-                    matrix2 = new double[row2, col2];
-                    matrixResult = new double[row2, col2];
+                    double[,] matrix1 = new double[row1, col1];
+                    double[,] matrix2 = new double[row2, col2];
+                    double[,] matrixResult = new double[row2, col2];
 
-                    string str1 = filling(1); //заполняем первую матрицу
-                    string str2 = filling(2);//заполняем вторую матрицу
-                    if (str1 == "ОК" && str2 == "ОК")
+
+                    //считываем значения из data grid в первую матрицу
+                    string str1 = readingFromDataGridView(ref matrix1, 1);
+
+                    //считываем значения из data grid во вторую матрицу
+                    string str2 = readingFromDataGridView(ref matrix2, 2);
+
+                    if (str1 == "ok" && str2 == "ok")
                     {
                         MatrixLibDLL.Lib.subtraction(ref matrix1, ref matrix2, ref matrixResult, row1, col1);
-                        fillingResult(row1, col1);
+                        fillingInDataGridView(row1, col1, ref matrixResult, 3);
                     }
                 }
             }
@@ -698,7 +663,7 @@ namespace matrixForm
             {
                 for (int j = 0; j < dataGridView1.ColumnCount; j++)
                 {
-                    dataGridView1.Rows[i].Cells[j].Value = rand.Next(-100,100);
+                    dataGridView1.Rows[i].Cells[j].Value = rand.Next(-100, 100);
 
                 }
             }
@@ -725,11 +690,11 @@ namespace matrixForm
         {
             try
             {
-                row1 = dataGridView1.RowCount;
-                col1 = dataGridView1.ColumnCount;
+                int row1 = dataGridView1.RowCount;
+                int col1 = dataGridView1.ColumnCount;
 
-                row2 = dataGridView2.RowCount;
-                col2 = dataGridView2.ColumnCount;
+                int row2 = dataGridView2.RowCount;
+                int col2 = dataGridView2.ColumnCount;
 
                 if (col1 != row2)
                 {
@@ -737,18 +702,21 @@ namespace matrixForm
                 }
                 else
                 {
-                    matrix1 = new double[row1, col1];
-                    matrix2 = new double[row2, col2];
-                    matrixResult = new double[row1, col2];
+                    double[,] matrix1 = new double[row1, col1];
+                    double[,] matrix2 = new double[row2, col2];
+                    double[,] matrixResult = new double[row1, col2];
 
-                    string str1 = filling(1); //заполняем первую матрицу
-                    string str2 = filling(2);//заполняем вторую матрицу
-                    if (str1 == "ОК" && str2 == "ОК")
+                    //считываем значения из data grid в первую матрицу
+                    string str1 = readingFromDataGridView(ref matrix1, 1);
+
+                    //считываем значения из data grid во вторую матрицу
+                    string str2 = readingFromDataGridView(ref matrix2, 2);
+
+                    if (str1 == "ok" && str2 == "ok")
                     {
                         MatrixLibDLL.Lib.multiplication(ref matrix1, ref matrix2, ref matrixResult, row1, row2, col1, col2);
-                        fillingResult(row1, col2);
+                        fillingInDataGridView(row1, col2, ref matrixResult, 3);
                     }
-
                 }
 
             }
@@ -765,8 +733,8 @@ namespace matrixForm
         {
             try
             {
-                row1 = dataGridView1.RowCount;
-                col1 = dataGridView1.ColumnCount;
+                int row1 = dataGridView1.RowCount;
+                int col1 = dataGridView1.ColumnCount;
 
                 if (row1 != col1)
                 {
@@ -774,10 +742,12 @@ namespace matrixForm
                 }
                 else
                 {
-                    matrix1 = new double[row1, col1];
-                    string str1 = filling(1); //заполняем первую матрицу
+                    double[,] matrix1 = new double[row1, col1];
 
-                    if (str1 == "ОК")
+                    //считываем значения из data grid в первую матрицу
+                    string str1 = readingFromDataGridView(ref matrix1, 1);
+
+                    if (str1 == "ok")
                     {
                         double det = MatrixLibDLL.Lib.Reverse.FindDeterminant(matrix1, row1);
                         textBox1.Text = "det = " + det;
@@ -800,8 +770,8 @@ namespace matrixForm
 
             try
             {
-                row2 = dataGridView2.RowCount;
-                col2 = dataGridView2.ColumnCount;
+                int row2 = dataGridView2.RowCount;
+                int col2 = dataGridView2.ColumnCount;
 
                 if (row2 != col2)
                 {
@@ -809,10 +779,12 @@ namespace matrixForm
                 }
                 else
                 {
-                    matrix2 = new double[row2, col2];
-                    string str1 = filling(2); //заполняем первую матрицу
+                    double[,] matrix2 = new double[row2, col2];
 
-                    if (str1 == "ОК")
+                    //считываем значения из data grid во вторую матрицу
+                    string str1 = readingFromDataGridView(ref matrix2, 2);
+
+                    if (str1 == "ok")
                     {
                         double det = MatrixLibDLL.Lib.Reverse.FindDeterminant(matrix2, row2);
                         textBox1.Text = "det = " + det;
@@ -829,13 +801,15 @@ namespace matrixForm
         }
 
 
-        //обратная для второй матрицы
+        //обратная для второй матрицы (ПОТОКИ)
         private void button8_Click(object sender, EventArgs e)
         {
-            try
+            Thread t1 = new Thread((o) =>
             {
-                row2 = dataGridView2.RowCount;
-                col2 = dataGridView2.ColumnCount;
+                try
+            {
+                int row2 = dataGridView2.RowCount;
+                int col2 = dataGridView2.ColumnCount;
 
                 if (row2 != col2)
                 {
@@ -843,10 +817,13 @@ namespace matrixForm
                 }
                 else
                 {
-                    matrix2 = new double[row2, col2];
-                    string str1 = filling(2); //заполняем вторую матрицу
+                    double[,] matrix2 = new double[row2, col2];
 
-                    if (str1 == "ОК")
+                    //считываем значения из data grid во вторую матрицу
+                    string str1 = readingFromDataGridView(ref matrix2, 2);
+
+
+                    if (str1 == "ok")
                     {
                         double det = MatrixLibDLL.Lib.Reverse.FindDeterminant(matrix2, row2);
 
@@ -857,7 +834,7 @@ namespace matrixForm
                         else
                         {
                             MatrixLibDLL.Lib.reverse(ref matrix2, row2, col2);
-                            fillingMatrix2(row2, col2);
+                            fillingInDataGridView(row2, col2, ref matrix2, 2);
                         }
                     }
 
@@ -869,6 +846,8 @@ namespace matrixForm
                 MessageBox.Show(ex.Message);
                 return;
             }
+            });
+            t1.Start();
         }
 
 
@@ -876,40 +855,23 @@ namespace matrixForm
         private void button7_Click(object sender, EventArgs e)
         {
 
-            row2 = dataGridView2.RowCount;
-            col2 = dataGridView2.ColumnCount;
+            int row2 = dataGridView2.RowCount;
+            int col2 = dataGridView2.ColumnCount;
 
-            matrix2 = new double[row2, col2];
-            matrixPtr = new double[col2, row2];
+            double[,] matrix2 = new double[row2, col2];
+            double[,] matrixPtr = new double[col2, row2];
 
-            string str1 = filling(2); //заполняем вторую матрицу
+            //считываем значения из data grid во вторую матрицу
+            string str1 = readingFromDataGridView(ref matrix2, 2);
 
-            if (str1 == "ОК")
+            if (str1 == "ok")
             {
                 MatrixLibDLL.Lib.transpose(ref matrix2, row2, col2, ref matrixPtr);
                 numericUpDown3.Value = col2;
                 numericUpDown4.Value = row2;
-                fillingMatrix2(col2, row2, matrixPtr);
-
-            }
-        }
-
-
-        // сохранить в файл
-        private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            saveFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
-            if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
-            {
-                return;
+                fillingInDataGridView(col2, row2, ref matrixPtr, 2);
             }
 
-            string filename = saveFileDialog1.FileName;
-
-            string str = createTextMatrix();
-
-            System.IO.File.WriteAllText(filename, str.ToString());
-            MessageBox.Show("Файл сохранен!");
         }
 
         // Печать
@@ -932,83 +894,147 @@ namespace matrixForm
                 printDialog.Document.Print(); // печатаем
         }
 
+
         // обработчик события печати
-       private void PrintPageHandler(object sender, PrintPageEventArgs e)
+        private void PrintPageHandler(object sender, PrintPageEventArgs e)
         {
             // задаем текст для печати
-            string str = createTextMatrix();
+            string str = createStringMatrix(4);
 
             // печать строки str
             e.Graphics.DrawString(str, new Font("Arial", 14), Brushes.Black, 0, 0);
         }
 
-        private void консольToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Console.WriteLine("hello");
-        }
 
-        // ввод матрицы А из файла
-       
+        // считывание матрицы А из файла
         private void матрицуАToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            openFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
-
-            if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+            try
             {
+                openFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
+
+                if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+                {
+                    return;
+                }
+
+                string filename = openFileDialog1.FileName;
+                string filetext = System.IO.File.ReadAllText(filename);
+
+                if (filetext.GetHashCode() != hashCode)
+                {
+                    throw new Exception("Осторожно, файл был изменен! ");
+
+                }
+                else
+                {
+
+                    string line = "";
+                    int flag = 1;
+                    dataGridView1.RowCount = 0;
+
+                    using (StreamReader sr = new StreamReader(filename, true))
+                    {
+                        while ((line = sr.ReadLine()) != null && flag == 1)
+                        {
+                            if (line[0] == ' ')
+                            {
+                                flag = 0;
+                            }
+                            else
+                            {
+                                string[] str = line.Split(' ');
+                                dataGridView1.ColumnCount = str.Length - 1;
+                                dataGridView1.RowCount++;
+
+                                for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                                {
+                                    dataGridView1.Rows[dataGridView1.RowCount - 1].Cells[j].Value = Convert.ToDouble(str[j]);
+
+                                }
+
+                            }
+                        }
+                        sr.Dispose();
+                    }
+
+                    MessageBox.Show("Файл открыт!");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
                 return;
             }
 
-            string filename = openFileDialog1.FileName;
-            string[] filetext = System.IO.File.ReadAllLines(filename);
-
-            string[] strPtr = filetext[0].Split(' ');
-            int column = strPtr.Length;
-
-            matrixPtr = new double[filetext.Length, column];
-            for (int i = 0; i < filetext.Length; i++) // идем построчно
-            {
-                string[] str = filetext[i].Split(' ');
-                for (int j = 0; j < column; j++)
-                {
-                    matrixPtr[i, j] = Convert.ToDouble(str[j]);
-                }
-            }
-            fillingMatrix1(filetext.Length, column, matrixPtr);
-
-
-            MessageBox.Show("Файл открыт!");
+            // fillingInDataGridView(filetext.Length, column, ref matrixPtr, 1);
         }
 
-        // ввод матрицы В из файла
+
+        // считывание матрицы B из файла
         private void матрицуВToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            openFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
-
-            if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+            try
             {
+                openFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
+
+                if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+                {
+                    return;
+                }
+
+                string filename = openFileDialog1.FileName;
+                string filetext = System.IO.File.ReadAllText(filename);
+
+                // textBox1.Text = Convert.ToString(hashCode);
+                // textBox2.Text = Convert.ToString(filetext.GetHashCode());
+                if (filetext.GetHashCode() != hashCode)
+                {
+                    throw new Exception("Осторожно, файл был изменен! ");
+                }
+                else
+                {
+
+                    string line = "";
+                    int flag = 1;
+                    dataGridView2.RowCount = 0;
+
+                    using (StreamReader sr = new StreamReader(filename, true))
+                    {
+                        while ((line = sr.ReadLine()) != null && flag == 1)
+                        {
+                            if (line[0] == ' ')
+                            {
+                                flag = 0;
+                            }
+                            else
+                            {
+                                string[] str = line.Split(' ');
+                                dataGridView2.ColumnCount = str.Length - 1;
+                                dataGridView2.RowCount++;
+
+                                for (int j = 0; j < dataGridView2.ColumnCount; j++)
+                                {
+                                    dataGridView2.Rows[dataGridView2.RowCount - 1].Cells[j].Value = Convert.ToDouble(str[j]);
+
+                                }
+
+                            }
+                        }
+                        sr.Dispose();
+                    }
+                    MessageBox.Show("Файл открыт!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
                 return;
             }
 
-            string filename = openFileDialog1.FileName;
-            string[] filetext = System.IO.File.ReadAllLines(filename);
-
-            string[] strPtr = filetext[0].Split(' ');
-            int column = strPtr.Length;
-
-            matrixPtr = new double[filetext.Length, column];
-            for (int i = 0; i < filetext.Length; i++) // идем построчно
-            {
-                string[] str = filetext[i].Split(' ');
-                for (int j = 0; j < column; j++)
-                {
-                    matrixPtr[i, j] = Convert.ToDouble(str[j]);
-                }
-            }
-            fillingMatrix2(filetext.Length, column, matrixPtr);
-
-
-            MessageBox.Show("Файл открыт!");
         }
+
 
         // проверка сложения 
         private void сложенияToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1016,28 +1042,27 @@ namespace matrixForm
             Check check = new Check(this);
             check.Show();
 
-            double[,] matrix_B = new double[dataGridView2.RowCount, dataGridView2.ColumnCount];
-            double[,] matrix_Res = new double[dataGridView3.RowCount, dataGridView3.ColumnCount];
+            int row2 = dataGridView2.RowCount;
+            int col2 = dataGridView2.ColumnCount;
 
-            for (int i = 0; i < dataGridView2.RowCount; i++) // идем построчно
+            int rowRes = dataGridView3.RowCount;
+            int colRes = dataGridView3.ColumnCount;
+
+            double[,] matrix_B = new double[row2, col2];
+            double[,] matrix_Res = new double[rowRes, colRes];
+
+            //считываем значения из data grid 
+            string str1 = readingFromDataGridView(ref matrix_B, 2);
+
+            //считываем значения из data grid 
+            string str2 = readingFromDataGridView(ref matrix_Res, 3);
+
+            if (str1 == "ok" && str2 == "ok")
             {
-                for (int j = 0; j < dataGridView2.ColumnCount; j++)
-                {
-                    matrix_B[i, j] = Convert.ToDouble(dataGridView2.Rows[i].Cells[j].Value);
-                }
+                check.sum(matrix_B, matrix_Res, row2, col2, rowRes, colRes);
             }
-
-            for (int i = 0; i < dataGridView3.RowCount; i++) // идем построчно
-            {
-                for (int j = 0; j < dataGridView3.ColumnCount; j++)
-                {
-                    matrix_Res[i, j] = Convert.ToDouble(dataGridView3.Rows[i].Cells[j].Value);
-                }
-            }
-
-            check.sum(matrix_B, matrix_Res, dataGridView2.RowCount, dataGridView2.ColumnCount, dataGridView3.RowCount, dataGridView3.ColumnCount);
-
         }
+
 
         // проверка вычитания 
         private void вычитанияToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1045,56 +1070,224 @@ namespace matrixForm
             Check check = new Check(this);
             check.Show();
 
-            double[,] matrix_B = new double[dataGridView2.RowCount, dataGridView2.ColumnCount];
-            double[,] matrix_Res = new double[dataGridView3.RowCount, dataGridView3.ColumnCount];
+            int row2 = dataGridView2.RowCount;
+            int col2 = dataGridView2.ColumnCount;
 
-            for (int i = 0; i < dataGridView2.RowCount; i++) 
+            int rowRes = dataGridView3.RowCount;
+            int colRes = dataGridView3.ColumnCount;
+
+            double[,] matrix_B = new double[row2, col2];
+            double[,] matrix_Res = new double[rowRes, colRes];
+
+            //считываем значения из data grid 
+            string str1 = readingFromDataGridView(ref matrix_B, 2);
+
+            //считываем значения из data grid 
+            string str2 = readingFromDataGridView(ref matrix_Res, 3);
+
+            if (str1 == "ok" && str2 == "ok")
             {
-                for (int j = 0; j < dataGridView2.ColumnCount; j++)
-                {
-                    matrix_B[i, j] = Convert.ToDouble(dataGridView2.Rows[i].Cells[j].Value);
-                }
+                check.sub(matrix_B, matrix_Res, row2, col2, rowRes, colRes);
             }
-
-            for (int i = 0; i < dataGridView3.RowCount; i++) 
-            {
-                for (int j = 0; j < dataGridView3.ColumnCount; j++)
-                {
-                    matrix_Res[i, j] = Convert.ToDouble(dataGridView3.Rows[i].Cells[j].Value);
-                }
-            }
-
-            check.sub(matrix_B, matrix_Res, dataGridView2.RowCount, dataGridView2.ColumnCount, dataGridView3.RowCount, dataGridView3.ColumnCount);
 
         }
+
+
         //проверка умножения
         private void умноженияToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Check check = new Check(this);
             check.Show();
 
-            double[,] matrix_B = new double[dataGridView2.RowCount, dataGridView2.ColumnCount];
-            double[,] matrix_Res = new double[dataGridView3.RowCount, dataGridView3.ColumnCount];
+            int row2 = dataGridView2.RowCount;
+            int col2 = dataGridView2.ColumnCount;
 
-            for (int i = 0; i < dataGridView2.RowCount; i++)
+            int rowRes = dataGridView3.RowCount;
+            int colRes = dataGridView3.ColumnCount;
+
+            double[,] matrix_B = new double[row2, col2];
+            double[,] matrix_Res = new double[rowRes, colRes];
+
+            //считываем значения из data grid 
+            string str1 = readingFromDataGridView(ref matrix_B, 2);
+
+            //считываем значения из data grid 
+            string str2 = readingFromDataGridView(ref matrix_Res, 3);
+
+            if (str1 == "ok" && str2 == "ok")
             {
-                for (int j = 0; j < dataGridView2.ColumnCount; j++)
-                {
-                    matrix_B[i, j] = Convert.ToDouble(dataGridView2.Rows[i].Cells[j].Value);
-                }
+                check.mult(matrix_B, matrix_Res, row2, col2, rowRes, colRes);
+            }
+        }
+
+
+        //для больших матриц
+        private void работаСБольшимиToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Calc calc = new Calc(this);
+            calc.Show();
+        }
+
+        //сохранить матрицу А в файл
+        private void матрицаАToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
+            if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
             }
 
-            for (int i = 0; i < dataGridView3.RowCount; i++)
+            string filename = saveFileDialog1.FileName;
+            string str = createStringMatrix(1);
+
+            //hashCode = str.GetHashCode(); // сохранили хэш
+            // textBox1.Text = Convert.ToString(hashCode);
+
+            string path = filename;
+            using (StreamWriter writer = new StreamWriter(path, true))
             {
-                for (int j = 0; j < dataGridView3.ColumnCount; j++)
-                {
-                    matrix_Res[i, j] = Convert.ToDouble(dataGridView3.Rows[i].Cells[j].Value);
-                }
+                writer.WriteLineAsync(str);
+                writer.Dispose();
             }
 
 
-            check.mult(matrix_B, matrix_Res, dataGridView2.RowCount, dataGridView2.ColumnCount, dataGridView3.RowCount, dataGridView3.ColumnCount);
+            string filetext = System.IO.File.ReadAllText(filename);
+
+            hashCode = filetext.GetHashCode();
+
+            //  System.IO.File.WriteAllText(filename, str.ToString());
+            MessageBox.Show("Файл сохранен!");
 
         }
+
+
+        //сохранить матрицу B в файл
+        private void матрицуВToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
+            if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            string filename = saveFileDialog1.FileName;
+            string str = createStringMatrix(2);
+
+            // hashCode = str.GetHashCode();
+
+            string path = filename;
+            using (StreamWriter writer = new StreamWriter(path, true))
+            {
+                writer.WriteLineAsync(str);
+                writer.Dispose();
+            }
+            string filetext = System.IO.File.ReadAllText(filename);
+
+            hashCode = filetext.GetHashCode();
+
+            //  System.IO.File.WriteAllText(filename, str.ToString());
+            MessageBox.Show("Файл сохранен!");
+        }
+
+        //сохранить результирующую матрицу в файл
+        private void результатToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            saveFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
+            if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            string filename = saveFileDialog1.FileName;
+            string str = createStringMatrix(3);
+
+            // hashCode = str.GetHashCode();
+
+            string path = filename;
+            using (StreamWriter writer = new StreamWriter(path, true))
+            {
+                writer.WriteLineAsync(str.ToString() + "\r\n");
+                writer.Dispose();
+            }
+            string filetext = System.IO.File.ReadAllText(filename);
+
+            hashCode = filetext.GetHashCode();
+
+            //  System.IO.File.WriteAllText(filename, str.ToString());
+            MessageBox.Show("Файл сохранен!");
+        }
+
+        // для проверки изменения файла
+        public static byte[] getFileHash(string path)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                return md5.ComputeHash(File.OpenRead(path));
+            }
+        }
+
+        // считывание результата  из файла
+        private void результатToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                openFileDialog1.Filter = "Text files(*.txt)|*.txt|ALL filese(*.*)|*.*";
+
+                if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+                {
+                    return;
+                }
+
+                string filename = openFileDialog1.FileName;
+                string filetext = System.IO.File.ReadAllText(filename);
+
+                // textBox1.Text = Convert.ToString(hashCode);
+                // textBox2.Text = Convert.ToString(filetext.GetHashCode());
+                if (filetext.GetHashCode() != hashCode)
+                {
+                    throw new Exception("Осторожно, файл был изменен! ");
+                }
+                else
+                {
+                    string line = "";
+                    int flag = 1;
+                    dataGridView3.RowCount = 0;
+
+                    using (StreamReader sr = new StreamReader(filename, true))
+                    {
+                        while ((line = sr.ReadLine()) != null && flag == 1)
+                        {
+                            if (line[0] == ' ')
+                            {
+                                flag = 0;
+                            }
+                            else
+                            {
+                                string[] str = line.Split(' ');
+                                dataGridView3.ColumnCount = str.Length - 1;
+                                dataGridView3.RowCount++;
+
+                                for (int j = 0; j < dataGridView3.ColumnCount; j++)
+                                {
+                                    dataGridView3.Rows[dataGridView3.RowCount - 1].Cells[j].Value = Convert.ToDouble(str[j]);
+
+                                }
+
+                            }
+                        }
+                        sr.Dispose();
+                    }
+                    MessageBox.Show("Файл открыт!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+        }
+
+       
     }
 }
