@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,7 +10,6 @@ using System.Windows.Forms;
 
 namespace matrixForm
 {
-
     public partial class Check : Form
     {
         private MatrixForm mainForm;
@@ -24,7 +23,7 @@ namespace matrixForm
             InitializeComponent();
             mainForm = f;
         }
-
+        //(ИЗМЕНЕНИЕ КЛЕТОК)
         public void sum(double[,] matrix2, double[,] matrixRes, int row2, int col2, int rowRes, int colRes)
         {
             try
@@ -47,9 +46,17 @@ namespace matrixForm
                     double[,] matrixResult = new double[row2, col2];
 
                     MatrixLibDLL.Lib.subtraction(ref matrixRes, ref matrix2, ref matrixResult, row2, col2);
-
+                    DataGridViewRow normalRowSize;
                     for (int i = 0; i < rowRes; i++) 
                     {
+                        normalRowSize = dataGridView1.Rows[i];
+                        normalRowSize.Height = (dataGridView1.Height / rowRes) - 5;
+
+                        normalRowSize = dataGridView2.Rows[i];
+                        normalRowSize.Height = (dataGridView2.Height / row2) - 5;
+
+                        normalRowSize = dataGridView3.Rows[i];
+                        normalRowSize.Height = (dataGridView3.Height / rowRes) - 5;
                         for (int j = 0; j < colRes; j++)
                         {
                             dataGridView1.Rows[i].Cells[j].Value = matrixRes[i, j];
@@ -68,7 +75,7 @@ namespace matrixForm
                 return;
             }
         }
-
+        //(ИЗМЕНЕНИЕ КЛЕТОК)
         public void sub(double[,] matrix2, double[,] matrixRes, int row2, int col2, int rowRes, int colRes)
         {
             try
@@ -91,9 +98,17 @@ namespace matrixForm
                     double[,] matrixResult = new double[row2, col2];
 
                     MatrixLibDLL.Lib.addition(ref matrixRes, ref matrix2, ref matrixResult, row2, col2);
-
+                    DataGridViewRow normalRowSize;
                     for (int i = 0; i < rowRes; i++)
                     {
+                        normalRowSize = dataGridView1.Rows[i];
+                        normalRowSize.Height = (dataGridView1.Height / rowRes) - 5;
+
+                        normalRowSize = dataGridView2.Rows[i];
+                        normalRowSize.Height = (dataGridView2.Height / row2) - 5;
+
+                        normalRowSize = dataGridView3.Rows[i];
+                        normalRowSize.Height = (dataGridView3.Height / rowRes) - 5;
                         for (int j = 0; j < colRes; j++)
                         {
                             dataGridView1.Rows[i].Cells[j].Value = matrixRes[i, j];
@@ -112,7 +127,7 @@ namespace matrixForm
                 return;
             }
         }
-
+        //(ИЗМЕНЕНИЕ КЛЕТОК)
         public void mult(double[,] matrix2, double[,] matrixRes, int row2, int col2, int rowRes, int colRes)
         {
             try
@@ -131,9 +146,17 @@ namespace matrixForm
 
                     dataGridView3.RowCount = rowRes;
                     dataGridView3.ColumnCount = col2;
-
+                    DataGridViewRow normalRowSize;
                     for (int i = 0; i < rowRes; i++)
                     {
+                        normalRowSize = dataGridView1.Rows[i];
+                        normalRowSize.Height = (dataGridView1.Height / rowRes) - 5;
+
+                        normalRowSize = dataGridView2.Rows[i];
+                        normalRowSize.Height = (dataGridView2.Height / row2) - 5;
+
+                        normalRowSize = dataGridView3.Rows[i];
+                        normalRowSize.Height = (dataGridView3.Height / rowRes) - 5;
                         for (int j = 0; j < colRes; j++)
                         {
                             dataGridView1.Rows[i].Cells[j].Value = matrixRes[i, j];
@@ -175,9 +198,7 @@ namespace matrixForm
                 return;
             }
         }
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
+      
     }
 }
+
